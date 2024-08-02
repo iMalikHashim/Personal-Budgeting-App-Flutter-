@@ -1,3 +1,4 @@
+import 'package:budget_pro/item.dart';
 import 'package:flutter/material.dart';
 import 'model/model.dart';
 
@@ -8,8 +9,7 @@ class ExpenseList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: expenseList.length,
-      itemBuilder: (context, index) => Text(expenseList[index].title),
-    );
+        itemCount: expenseList.length,
+        itemBuilder: (context, index) => Item(budget: expenseList[index]));
   }
 }
