@@ -30,7 +30,7 @@ class BudgetModel {
 }
 
 class Category {
-  final Set<String> categories = {'Food', 'Entertainment', 'Bills', 'Travel'};
+  static Set<String> categories = {'Food', 'Entertainment', 'Bills', 'Travel'};
 
   void addCategory(String newCategory) {
     if (categories.add(newCategory)) {
