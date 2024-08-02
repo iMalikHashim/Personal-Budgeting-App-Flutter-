@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'model/model.dart';
 
 class Budget extends StatefulWidget {
   const Budget({super.key});
@@ -8,6 +9,12 @@ class Budget extends StatefulWidget {
 }
 
 class _BudgetState extends State<Budget> {
+  final List<BudgetModel> _budgetList = [
+    BudgetModel(
+      title: "Anything",
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
