@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'budget.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,33 +23,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Firebase Integration Test',
-      home: HomeScreen(),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Firebase Test')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () async {
-            // Test Firestore
-            try {
-              await FirebaseFirestore.instance
-                  .collection('test')
-                  .add({'timestamp': DateTime.now()});
-              print('Document added successfully');
-            } catch (e) {
-              print('Error adding document: $e');
-            }
-          },
-          child: Text('Test Firestore'),
-        ),
-      ),
+      title: 'Budget Pro',
+      home: Budget(),
     );
   }
 }
