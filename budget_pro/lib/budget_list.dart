@@ -8,6 +8,7 @@ class ExpenseList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      itemCount: expenseList.length,
       itemBuilder: (context, index) => Text(expenseList[index].title),
     );
   }
