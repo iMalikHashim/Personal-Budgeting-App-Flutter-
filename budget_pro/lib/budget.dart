@@ -44,11 +44,19 @@ class _BudgetState extends State<Budget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Add Budget"),
+        title: const Text("Budget Pro"),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.add),
+          ),
+        ],
       ),
       body: Column(
         children: [
-          const Text("Alpha"),
+          const SizedBox(
+            height: 2,
+          ),
           Expanded(
             child: ExpenseList(expenseList: _budgetList),
           ),

@@ -23,7 +23,7 @@ class Item extends StatelessWidget {
             Row(
               children: [
                 const Icon(Icons.date_range_rounded),
-                Text(budget.date.day.toString()),
+                Text(budget.formattedDate),
               ],
             )
           ]),

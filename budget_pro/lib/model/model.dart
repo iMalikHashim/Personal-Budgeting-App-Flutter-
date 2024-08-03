@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
+import 'package:intl/intl.dart';
 
+final fDate = DateFormat.yMd();
 const uid = Uuid();
 
 class BudgetModel {
@@ -19,6 +21,10 @@ class BudgetModel {
   double spentAmount;
   final DateTime date;
   final String category;
+
+  String get formattedDate {
+    return fDate.format(date);
+  }
 
   void updateSpentAmount(double amount) {
     if (amount <= budgetAmount) {
