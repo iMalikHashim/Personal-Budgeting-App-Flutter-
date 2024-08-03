@@ -1,3 +1,4 @@
+import 'package:budget_pro/budgetInput.dart';
 import 'package:budget_pro/budget_list.dart';
 import 'package:flutter/material.dart';
 import 'model/model.dart';
@@ -15,6 +16,13 @@ class _BudgetState extends State<Budget> {
 
   // List to hold budget items
   List<BudgetModel> _budgetList = [];
+
+  void _showFrom() {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => const Input(),
+    );
+  }
 
   @override
   void initState() {
@@ -47,7 +55,7 @@ class _BudgetState extends State<Budget> {
         title: const Text("Budget Pro"),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: _showFrom,
             icon: const Icon(Icons.add),
           ),
         ],
