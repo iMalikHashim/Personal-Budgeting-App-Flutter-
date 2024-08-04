@@ -13,23 +13,28 @@ class _InputState extends State<Input> {
   final _titleController = TextEditingController();
   final _spentAmountController = TextEditingController();
   DateTime? _pickedDate;
-
-  void _datePicker() async {
-    final now = DateTime.now();
-    final firstDate = DateTime(now.year - 1, now.month, now.day);
-    DateTime? selectedDate = await showDatePicker(
-        context: context, firstDate: firstDate, lastDate: now);
-
-    setState(() {
-      _pickedDate = selectedDate;
-    });
-  }
+  String? _selectedCategory; // Variable to track the selected category
 
   @override
   void dispose() {
     _titleController.dispose();
     _spentAmountController.dispose();
     super.dispose();
+  }
+
+  void _datePicker() async {
+    final now = DateTime.now();
+    final firstDate = DateTime(now.year - 1, now.month, now.day);
+    DateTime? selectedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: firstDate,
+      lastDate: now,
+    );
+
+    setState(() {
+      _pickedDate = selectedDate;
+    });
   }
 
   @override
@@ -46,6 +51,7 @@ class _InputState extends State<Input> {
             ),
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
                 child: TextField(
@@ -67,31 +73,50 @@ class _InputState extends State<Input> {
                     ),
                     IconButton(
                       onPressed: _datePicker,
-                      icon: Icon(Icons.calendar_month),
+                      icon: const Icon(Icons.calendar_month),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(
-            height: 6,
-          ),
+          const SizedBox(height: 10),
+          const SizedBox(height: 6),
           Row(
             children: [
+              DropdownButton<String>(
+                hint: const Text("Select Category"),
+                value: _selectedCategory,
+                items: Category.categories.map((String category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedCategory = newValue!;
+                  });
+                },
+              ),
+              const Spacer(),
               ElevatedButton(
-                onPressed: () => print(_titleController.text),
+                onPressed: () {
+                  print("Title: ${_titleController.text}");
+                  print("Spent Amount: ${_spentAmountController.text}");
+                  print(
+                      "Date: ${_pickedDate != null ? fDate.format(_pickedDate!) : 'No Date Selected'}");
+                  print("Category: $_selectedCategory");
+                },
                 child: const Text("Print"),
               ),
-              const SizedBox(
-                width: 20,
-              ),
+              const SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 child: const Text("Cancel"),
               ),
             ],
-          )
+          ),
         ],
       ),
     );
