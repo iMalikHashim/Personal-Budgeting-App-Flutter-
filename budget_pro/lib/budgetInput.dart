@@ -51,7 +51,7 @@ class _InputState extends State<Input> {
           await FirebaseFirestore.instance.collection('categories').get();
       setState(() {
         _categories =
-            snapshot.docs.map((doc) => doc['name'] as String).toList();
+            snapshot.docs.map((doc) => doc['category'] as String).toList();
       });
     } catch (e) {
       print("Error fetching categories: $e");

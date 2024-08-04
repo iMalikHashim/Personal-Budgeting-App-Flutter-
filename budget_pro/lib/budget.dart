@@ -47,22 +47,25 @@ class _BudgetState extends State<Budget> {
           await FirebaseFirestore.instance.collection('categories').get();
       setState(() {
         _categories =
-            snapshot.docs.map((doc) => doc['name'] as String).toList();
+            snapshot.docs.map((doc) => doc['category'] as String).toList();
       });
     } catch (e) {
       print("Error fetching categories: $e");
     }
   }
 
-  void _addCategory(String newCategory) async {
+  void _addCategory(String newCategory, double amount) async {
     try {
       await FirebaseFirestore.instance.collection('categories').add({
-        'name': newCategory,
+        'category': newCategory,
+        'budget': amount,
       });
-      // Update the local category list
-      setState(() {
-        _categories.add(newCategory);
-      });
+
+      if (mounted) {
+        setState(() {
+          _categories.add(newCategory);
+        });
+      }
     } catch (e) {
       print("Error adding category: $e");
     }
@@ -72,9 +75,10 @@ class _BudgetState extends State<Budget> {
     showModalBottomSheet(
       context: context,
       builder: (ctx) => AddCategoryForm(
-        onAdd: (newCategory) {
-          Navigator.of(ctx).pop();
-          _addCategory(newCategory);
+        onAdd: (newCategory, amount) {
+          if (mounted) {
+            _addCategory(newCategory, amount);
+          }
         },
       ),
     );
