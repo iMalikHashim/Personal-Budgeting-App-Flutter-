@@ -46,8 +46,10 @@ class _BudgetState extends State<Budget> {
       final snapshot =
           await FirebaseFirestore.instance.collection('categories').get();
       setState(() {
-        _categories =
-            snapshot.docs.map((doc) => doc['category'] as String).toList();
+        _categories = snapshot.docs
+            .map((doc) => doc['category'] as String)
+            .toSet()
+            .toList();
       });
     } catch (e) {
       print("Error fetching categories: $e");
@@ -142,7 +144,14 @@ class _BudgetState extends State<Budget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Budget Pro"),
+        foregroundColor: Color(0xFF055B5C),
+        title: Text(
+          "Budget Pro",
+          style: TextStyle(
+            color: Color(0xFF055B5C), // Set the color you prefer
+            fontWeight: FontWeight.bold, // Make the text bold
+          ),
+        ),
         actions: [
           IconButton(
             onPressed: () => _showAddCategoryForm(),

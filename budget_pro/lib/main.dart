@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Budget Pro',
+      color: Color(0xFF055B5C),
       home: SplashScreen(),
     );
   }
