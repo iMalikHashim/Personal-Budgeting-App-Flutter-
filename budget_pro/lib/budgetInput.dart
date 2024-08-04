@@ -134,24 +134,24 @@ class _InputState extends State<Input> {
             ],
           ),
           const SizedBox(height: 10),
-          DropdownButton<String>(
-            hint: const Text("Select Category"),
-            value: _selectedCategory,
-            items: Category.categories.map((String category) {
-              return DropdownMenuItem<String>(
-                value: category,
-                child: Text(category),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                _selectedCategory = newValue!;
-              });
-            },
-          ),
-          const SizedBox(height: 6),
           Row(
             children: [
+              DropdownButton<String>(
+                hint: const Text("Select Category"),
+                value: _selectedCategory,
+                items: Category.categories.map((String category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedCategory = newValue!;
+                  });
+                },
+              ),
+              const Spacer(),
               ElevatedButton(
                 onPressed: _submitData, // Submit data to Firestore
                 child: const Text("Submit"),

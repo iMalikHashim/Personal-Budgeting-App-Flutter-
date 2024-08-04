@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 final fDate = DateFormat.yMd();
 const uid = Uuid();
@@ -21,6 +22,15 @@ class BudgetModel {
   double spentAmount;
   final DateTime date;
   final String category;
+
+  factory BudgetModel.fromFirestore(Map<String, dynamic> data) {
+    return BudgetModel(
+      title: data['title'] ?? '',
+      budgetAmount: data['spentAmount'] ?? 0.0,
+      date: (data['date'] as Timestamp).toDate(),
+      category: data['category'] ?? '',
+    );
+  }
 
   String get formattedDate {
     return fDate.format(date);
