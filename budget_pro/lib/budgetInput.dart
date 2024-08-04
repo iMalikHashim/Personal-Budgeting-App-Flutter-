@@ -1,6 +1,7 @@
 import 'package:budget_pro/model/model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Input extends StatefulWidget {
   const Input({super.key});
@@ -13,7 +14,7 @@ class _InputState extends State<Input> {
   final _titleController = TextEditingController();
   final _spentAmountController = TextEditingController();
   DateTime? _pickedDate;
-  String? _selectedCategory; // Variable to track the selected category
+  String? _selectedCategory;
 
   @override
   void dispose() {
@@ -35,6 +36,58 @@ class _InputState extends State<Input> {
     setState(() {
       _pickedDate = selectedDate;
     });
+  }
+
+  Future<void> _submitData() async {
+    final title = _titleController.text;
+    final spentAmount = double.tryParse(_spentAmountController.text);
+    final date = _pickedDate;
+    final category = _selectedCategory;
+
+    if (title.isEmpty ||
+        spentAmount == null ||
+        date == null ||
+        category == null) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text("Invalid Input"),
+          content: Text("Please fill in all fields"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Okay"),
+              onPressed: () => Navigator.of(ctx).pop(),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Add data to Firestore
+      await FirebaseFirestore.instance.collection('budgetData').add({
+        'title': title,
+        'spentAmount': spentAmount,
+        'date': date,
+        'category': category,
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Data submitted successfully")),
+      );
+
+      _titleController.clear();
+      _spentAmountController.clear();
+      setState(() {
+        _pickedDate = null;
+        _selectedCategory = null;
+      });
+    } catch (error) {
+      print("Error submitting data: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error submitting data")),
+      );
+    }
   }
 
   @override
@@ -81,34 +134,27 @@ class _InputState extends State<Input> {
             ],
           ),
           const SizedBox(height: 10),
+          DropdownButton<String>(
+            hint: const Text("Select Category"),
+            value: _selectedCategory,
+            items: Category.categories.map((String category) {
+              return DropdownMenuItem<String>(
+                value: category,
+                child: Text(category),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                _selectedCategory = newValue!;
+              });
+            },
+          ),
           const SizedBox(height: 6),
           Row(
             children: [
-              DropdownButton<String>(
-                hint: const Text("Select Category"),
-                value: _selectedCategory,
-                items: Category.categories.map((String category) {
-                  return DropdownMenuItem<String>(
-                    value: category,
-                    child: Text(category),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedCategory = newValue!;
-                  });
-                },
-              ),
-              const Spacer(),
               ElevatedButton(
-                onPressed: () {
-                  print("Title: ${_titleController.text}");
-                  print("Spent Amount: ${_spentAmountController.text}");
-                  print(
-                      "Date: ${_pickedDate != null ? fDate.format(_pickedDate!) : 'No Date Selected'}");
-                  print("Category: $_selectedCategory");
-                },
-                child: const Text("Print"),
+                onPressed: _submitData, // Submit data to Firestore
+                child: const Text("Submit"),
               ),
               const SizedBox(width: 20),
               ElevatedButton(
