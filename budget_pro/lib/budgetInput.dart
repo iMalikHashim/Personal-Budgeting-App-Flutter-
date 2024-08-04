@@ -1,10 +1,17 @@
-import 'package:budget_pro/model/model.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:budget_pro/model/model.dart';
 
 class Input extends StatefulWidget {
-  const Input({super.key});
+  final BudgetModel? budgetItem;
+  final Function(BudgetModel) onSave;
+
+  const Input({
+    super.key,
+    this.budgetItem,
+    required this.onSave,
+  });
 
   @override
   State<Input> createState() => _InputState();
@@ -15,12 +22,40 @@ class _InputState extends State<Input> {
   final _spentAmountController = TextEditingController();
   DateTime? _pickedDate;
   String? _selectedCategory;
+  List<String> _categories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategories();
+
+    if (widget.budgetItem != null) {
+      final item = widget.budgetItem!;
+      _titleController.text = item.title;
+      _spentAmountController.text = item.budgetAmount.toString();
+      _pickedDate = item.date;
+      _selectedCategory = item.category;
+    }
+  }
 
   @override
   void dispose() {
     _titleController.dispose();
     _spentAmountController.dispose();
     super.dispose();
+  }
+
+  void _fetchCategories() async {
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('categories').get();
+      setState(() {
+        _categories =
+            snapshot.docs.map((doc) => doc['name'] as String).toList();
+      });
+    } catch (e) {
+      print("Error fetching categories: $e");
+    }
   }
 
   void _datePicker() async {
@@ -38,7 +73,7 @@ class _InputState extends State<Input> {
     });
   }
 
-  Future<void> _submitData() async {
+  void _submitData() {
     final title = _titleController.text;
     final spentAmount = double.tryParse(_spentAmountController.text);
     final date = _pickedDate;
@@ -51,11 +86,11 @@ class _InputState extends State<Input> {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text("Invalid Input"),
-          content: Text("Please fill in all fields"),
+          title: const Text("Invalid Input"),
+          content: const Text("Please fill in all fields"),
           actions: <Widget>[
             TextButton(
-              child: Text("Okay"),
+              child: const Text("Okay"),
               onPressed: () => Navigator.of(ctx).pop(),
             ),
           ],
@@ -64,30 +99,16 @@ class _InputState extends State<Input> {
       return;
     }
 
-    try {
-      // Add data to Firestore
-      await FirebaseFirestore.instance.collection('budgetData').add({
-        'title': title,
-        'spentAmount': spentAmount,
-        'date': date,
-        'category': category,
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Data submitted successfully")),
-      );
+    final budgetItem = BudgetModel(
+      id: widget.budgetItem?.id ?? '', // Use existing ID for editing
+      title: title,
+      budgetAmount: spentAmount,
+      date: date,
+      category: category,
+    );
 
-      _titleController.clear();
-      _spentAmountController.clear();
-      setState(() {
-        _pickedDate = null;
-        _selectedCategory = null;
-      });
-    } catch (error) {
-      print("Error submitting data: $error");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error submitting data")),
-      );
-    }
+    widget.onSave(budgetItem);
+    Navigator.pop(context);
   }
 
   @override
@@ -113,6 +134,7 @@ class _InputState extends State<Input> {
                     hintText: "250",
                     prefixText: "Rs. ",
                   ),
+                  keyboardType: TextInputType.number,
                 ),
               ),
               Expanded(
@@ -122,7 +144,7 @@ class _InputState extends State<Input> {
                     Text(
                       _pickedDate == null
                           ? "No Date Selected!"
-                          : fDate.format(_pickedDate!),
+                          : DateFormat.yMd().format(_pickedDate!),
                     ),
                     IconButton(
                       onPressed: _datePicker,
@@ -139,7 +161,7 @@ class _InputState extends State<Input> {
               DropdownButton<String>(
                 hint: const Text("Select Category"),
                 value: _selectedCategory,
-                items: Category.categories.map((String category) {
+                items: _categories.map((String category) {
                   return DropdownMenuItem<String>(
                     value: category,
                     child: Text(category),
@@ -154,7 +176,7 @@ class _InputState extends State<Input> {
               const Spacer(),
               ElevatedButton(
                 onPressed: _submitData, // Submit data to Firestore
-                child: const Text("Submit"),
+                child: Text(widget.budgetItem == null ? "Add" : "Update"),
               ),
               const SizedBox(width: 20),
               ElevatedButton(

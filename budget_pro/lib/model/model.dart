@@ -13,8 +13,8 @@ class BudgetModel {
     this.spentAmount = 0.0,
     DateTime? date,
     required this.category,
-  })  : id = uid.v4(),
-        date = date ?? DateTime.now();
+    this.id = '',
+  }) : date = date ?? DateTime.now();
 
   final String id;
   final String title;
@@ -23,13 +23,23 @@ class BudgetModel {
   final DateTime date;
   final String category;
 
-  factory BudgetModel.fromFirestore(Map<String, dynamic> data) {
+  factory BudgetModel.fromFirestore(Map<String, dynamic> data, String id) {
     return BudgetModel(
+      id: id,
       title: data['title'] ?? '',
       budgetAmount: data['spentAmount'] ?? 0.0,
       date: (data['date'] as Timestamp).toDate(),
       category: data['category'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'spentAmount': budgetAmount,
+      'date': date,
+      'category': category,
+    };
   }
 
   String get formattedDate {
