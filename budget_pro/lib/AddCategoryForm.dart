@@ -117,10 +117,18 @@ class _AddCategoryFormState extends State<AddCategoryForm> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(
+                  Colors.teal), // Set background color
+            ),
             onPressed: _isSubmitting ? null : _submit,
             child: _isSubmitting
                 ? const CircularProgressIndicator()
-                : const Text("Add Category"),
+                : const Text(
+                    "Add Category",
+                    style: TextStyle(
+                        color: Colors.white), // Set text color to white
+                  ),
           ),
         ],
       ),
